@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Checkit": {
+            "applicationId": "Ejby6VzR7hmTnk5q0uu6ECEQwa0miasX9kU33upY", 
+            "masterKey": "feHFKwv1JIYk5QYq8HnKzBEcRsZps0RfL9EhMp2g"
+        }, 
+        "_default": {
+            "link": "Checkit"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.3.5"
+    }
+}
