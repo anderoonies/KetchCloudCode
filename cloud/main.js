@@ -36,8 +36,10 @@ Parse.Cloud.define("push", function(request, response) {
 	});
 });
 
-Parse.Cloud.afterSave('event', function(request, response) {
-  query = new Parse.Query("event");
+Parse.Cloud.job("eventDeletion", function(request, status) {
+  // Set up to modify user data
+  Parse.Cloud.useMasterKey();
+	query = new Parse.Query("event");
 
   var d = new Date();
   var todaysDate = new Date(d.getTime()); 
