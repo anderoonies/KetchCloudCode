@@ -68,3 +68,28 @@ Parse.Cloud.job("eventDeletion", function(request, status) {
 	  }
 	});
 });
+
+Parse.Cloud.beforeSave("event", function(request, response) {
+	query = new Parse.Query("event");
+	query.equalTo('owner', request.object.get('user'));
+
+	query.find({
+		success: function(results) {
+	    for (var i = 0; i < results.length; i++) { 
+	      var object = results[i];
+	      object.destroy({
+				  success: function(object) {
+				    // The object was deleted from the Parse Cloud.
+					    alert('DESTROYED!!!' + object);
+				  },
+				  error: function(myObject, error) {
+				    // The delete failed.
+				    // error is a Parse.Error with an error code and message.
+				  }
+				});
+	    }
+		}
+	});
+
+	response.success();
+});
