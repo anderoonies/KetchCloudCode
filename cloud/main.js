@@ -21,7 +21,7 @@ Parse.Cloud.define("push", function(request, response) {
 	Parse.Push.send({
 	  where: query, // Set our Installation query
 	  data: {
-	    alert: "Someone nudged you!",
+	    alert: senderUsername + " nudged you!",
 	    senderId: senderId,
 	    senderPhone: senderPhone,
 	    senderUsername: senderUsername,
@@ -67,7 +67,44 @@ Parse.Cloud.job("eventDeletion", function(request, status) {
 	    alert("Error: " + error.code + " " + error.message);
 	  }
 	});
-});
+
+},
+{
+	success:function() {
+		response.success('all good');
+	},
+	error: function(error) {
+		throw "Error!!" + error.message; error
+	}
+}
+);
+
+Parse.Cloud.define('friendAddNotify', function(request, response) {
+	var senderId = request.params.userId;
+	var senderUsername = request.params.username;
+	var toUserId = request.params.targetId;
+	var userQuery = new Parse.Query(Parse.User);
+	var installationQuery = new Parse.Query(Parse.Installation);
+
+	userQuery.equalTo('objectId', toUserId);
+	installationQuery.matchesQuery('owner', userQuery);
+
+	Parse.Push.send({
+	  where: installationQuery, // Set our Installation query
+	  data: {
+	    alert: senderUsername + " friended you!",
+	    senderId: senderId,
+	    senderUsername: senderUsername,
+	  }
+	}, {
+	  success: function() {
+	    response.success('all good');
+	  },
+	  error: function(error) {
+	    throw "Got an error " + error.code + " : " + error.message; error
+	  }
+	});
+})
 
 Parse.Cloud.beforeSave("event", function(request, response) {
 	query = new Parse.Query("event");
