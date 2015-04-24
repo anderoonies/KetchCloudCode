@@ -66,17 +66,28 @@ Parse.Cloud.job("eventDeletion", function(request, status) {
 	  error: function(error) {
 	    alert("Error: " + error.code + " " + error.message);
 	  }
-	});
-
-},
-{
-	success:function() {
-		response.success('all good');
+	}),
+	{
+		success:function() {
+			response.success('all good');
 	},
-	error: function(error) {
-		throw "Error!!" + error.message; error
+		error: function(error) {
+			throw "Error!!" + error.message; error
 	}
 }
+});
+
+Parse.Cloud.define('errorLog', function(request, response) {
+		var error = request.params.issue;
+		console.log(error);
+	}, {
+		success: function() {
+			response.success('good');
+		},
+		error: function() {
+			response.success('bad');
+		}
+	}
 );
 
 Parse.Cloud.define('friendAddNotify', function(request, response) {
