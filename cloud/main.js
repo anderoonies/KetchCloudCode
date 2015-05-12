@@ -9,10 +9,25 @@ Parse.Cloud.define("push", function(request, response) {
 	var query = new Parse.Query(Parse.Installation);
 	var userQuery = new Parse.Query(Parse.User);
 
+	var senderQuery = new Parse.Query(Parse.User);
+
 	userId = request.params.targetUserId;
 	senderId = request.params.senderId;
 	senderPhone = request.params.senderPhone;
 	senderUsername = request.params.senderUsername
+
+	senderQuery.equalTo('objectId', senderId);
+	senderQuery.find({
+		success: function(result) {
+			console.log('ayy lmao'+result);
+			var sender = result[0];
+			sender.increment('nudgeCount');
+			sender.save();
+		},
+		error: function(error) {
+			result.error("Problem!!" + error.message);p
+		}
+	})
 
 	userQuery.equalTo('objectId', userId);
  
@@ -116,6 +131,31 @@ Parse.Cloud.define('friendAddNotify', function(request, response) {
 	  }
 	});
 })
+
+Parse.Cloud.afterSave("event", function(request, response) {
+	var user = request.object.get('user');
+	user.increment('eventCount');
+	user.save();
+
+	var dimensions = {
+	  locaton: String(request.object.get('location')),
+	  user: String(request.object.get('user')),
+	  friends: String(request.object.get('canSee')),
+	  blurb: String(request.object.get('blurb'))
+	};
+
+	// Send the dimensions to Parse along with the 'search' event
+	Parse.Analytics.track('eventCreateCloud', dimensions);
+
+});
+
+Parse.Cloud.afterSave('Group', function(request, response) {
+	var group = request.object;
+	var user = request.object.get('creator');
+	var relation = user.relation("group");
+	relation.add(group);
+	user.save();
+});
 
 Parse.Cloud.beforeSave("event", function(request, response) {
 	query = new Parse.Query("event");
